@@ -199,16 +199,6 @@ c2:"View tracking you can trust, so the numbers are real",
 c3:"Payments: brands paying in and clippers getting paid",
 c4:"Computer engineering or software experience helps, but what you’ve built matters more than your degree."
 });
- var FORM = {
-  action: https://script.google.com/macros/s/AKfycbxGwq_lhHYpUWHN5OeFGAmtQ8RX9llyJaYNLtu9xVyhL7EJKgTjI-O-6KD68sBOW2OM/exec",
-  fields: {
-    type: "type",
-    name: "name",
-    method: "method",
-    handle: "handle",
-    built: "built"
-  }
-};
 Object.assign(T.ar,{
 how:"لصنّاع المقاطع والمبدعين",
 s1:"تصفّح حملات من براندات ومبدعين. لكل حملة سعرها الخاص لكل 1000 مشاهدة، وتراه قبل أن تبدأ.",
@@ -284,6 +274,61 @@ document.getElementById("form").addEventListener("submit",function(e){
 document.getElementById("lang").addEventListener("click",function(){
   setLang(document.documentElement.lang==="ar"?"en":"ar");
 });
+
+  <form id="waitlist-form">
+  <select name="role" required>
+    <option value="Clipper/creator">Clipper/creator</option>
+    <option value="YouTuber">YouTuber</option>
+    <option value="Brand">Brand</option>
+    <option value="Technical co-founder">Technical co-founder</option>
+  </select>
+
+  <input type="text" name="name" placeholder="Full Name or Brand" required />
+
+  <select name="contactMethod" required>
+    <option value="WhatsApp">WhatsApp</option>
+    <option value="Instagram">Instagram</option>
+    <option value="Facebook">Facebook</option>
+  </select>
+
+  <input type="text" name="handle" placeholder="Handle, Link, or Phone Number" required />
+  <textarea name="built" placeholder="What Have You Built? (Optional)"></textarea>
+
+  <button type="submit" id="submit-btn">Join Waitlist</button>
+</form>
+
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0OWroVBwlwuJ5nyJK2zI5e8c_cRE9o-uZXFJz25mWtgFeta1IJaRHAu8Epvu4LFsgdQ/exec";
+  const form = document.getElementById("waitlist-form");
+  const btn = document.getElementById("submit-btn");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    btn.disabled = true;
+    btn.textContent = "Submitting...";
+
+    const formData = new FormData(form);
+    const payload = Object.fromEntries(formData.entries());
+
+    try {
+      await fetch(SCRIPT_URL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      alert("You're on the waitlist!");
+      form.reset();
+    } catch (err) {
+      alert("Something went wrong. Please try again.");
+      console.error(err);
+    } finally {
+      btn.disabled = false;
+      btn.textContent = "Join Waitlist";
+    }
+  });
+</script>
 </script>
 </body>
 </html>
