@@ -231,12 +231,13 @@ function setLang(l){
 var start=((navigator.language||"en").slice(0,2)==="ar")?"ar":"en";
 try{start=localStorage.getItem("shuhra-lang")||start;}catch(e){}
 setLang(start);
-// ---- SETTINGS (fill these in) ----
-// Google Form that fills your sheet. Action = form link ending in /formResponse. Fields = the entry.XXXX codes.
-
-// Optional fallback: WhatsApp number, digits only with country code (e.g. 201012345678)
+// ---- SETTINGS ----
+// Your Google Apps Script link: it writes each sign-up into your Google Sheet.
+var SCRIPT_URL="https://script.google.com/macros/s/AKfycbz0OWroVBwlwuJ5nyJK2zI5e8c_cRE9o-uZXFJz25mWtgFeta1IJaRHAu8Epvu4LFsgdQ/exec";
+// Optional fallback if SCRIPT_URL is empty: WhatsApp number, digits only with country code (e.g. 201012345678)
 var WA_NUMBER="";
-// ---------------------------------- // digits only with country code, e.g. 201012345678
+// ------------------
+ // digits only with country code, e.g. 201012345678
 var typeEl=document.getElementById("type");
 function toggleFields(){
   var v=typeEl.value, clip=(v==="Clipper/creator");
@@ -254,12 +255,9 @@ document.getElementById("form").addEventListener("submit",function(e){
   if(!name||!contact){st.textContent=d.eerr;return;}
   var how=clip?"WhatsApp":document.getElementById("how").value;
   var built=document.getElementById("built").value.trim();
-  if(FORM.action){
-    var fd=new FormData();
-    fd.append(FORM.fields.type,v);fd.append(FORM.fields.name,name);
-    fd.append(FORM.fields.method,how);fd.append(FORM.fields.handle,contact);
-    if(FORM.fields.built){fd.append(FORM.fields.built,built);}
-    fetch(FORM.action,{method:"POST",mode:"no-cors",body:fd}).then(function(){
+  if(SCRIPT_URL){
+    var payload={role:v,name:name,contactMethod:how,handle:contact,built:built};
+    fetch(SCRIPT_URL,{method:"POST",mode:"no-cors",body:JSON.stringify(payload)}).then(function(){
       st.textContent=d.ethanks;document.getElementById("form").reset();toggleFields();
     }).catch(function(){st.textContent=d.efail;});
     return;
@@ -274,61 +272,6 @@ document.getElementById("form").addEventListener("submit",function(e){
 document.getElementById("lang").addEventListener("click",function(){
   setLang(document.documentElement.lang==="ar"?"en":"ar");
 });
-
-  <form id="waitlist-form">
-  <select name="role" required>
-    <option value="Clipper/creator">Clipper/creator</option>
-    <option value="YouTuber">YouTuber</option>
-    <option value="Brand">Brand</option>
-    <option value="Technical co-founder">Technical co-founder</option>
-  </select>
-
-  <input type="text" name="name" placeholder="Full Name or Brand" required />
-
-  <select name="contactMethod" required>
-    <option value="WhatsApp">WhatsApp</option>
-    <option value="Instagram">Instagram</option>
-    <option value="Facebook">Facebook</option>
-  </select>
-
-  <input type="text" name="handle" placeholder="Handle, Link, or Phone Number" required />
-  <textarea name="built" placeholder="What Have You Built? (Optional)"></textarea>
-
-  <button type="submit" id="submit-btn">Join Waitlist</button>
-</form>
-
-<script>
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz0OWroVBwlwuJ5nyJK2zI5e8c_cRE9o-uZXFJz25mWtgFeta1IJaRHAu8Epvu4LFsgdQ/exec";
-  const form = document.getElementById("waitlist-form");
-  const btn = document.getElementById("submit-btn");
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    btn.disabled = true;
-    btn.textContent = "Submitting...";
-
-    const formData = new FormData(form);
-    const payload = Object.fromEntries(formData.entries());
-
-    try {
-      await fetch(SCRIPT_URL, {
-        method: "POST",
-        mode: "no-cors",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      alert("You're on the waitlist!");
-      form.reset();
-    } catch (err) {
-      alert("Something went wrong. Please try again.");
-      console.error(err);
-    } finally {
-      btn.disabled = false;
-      btn.textContent = "Join Waitlist";
-    }
-  });
-</script>
 </script>
 </body>
 </html>
